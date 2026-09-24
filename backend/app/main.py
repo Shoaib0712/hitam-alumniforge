@@ -784,3 +784,36 @@ def create_admin_if_not_exists():
         #     db.commit()
     finally:
         pass # db.close()
+    import csv
+import os
+from sqlalchemy.orm import Session
+# Import your database session and User model here (e.g., from database import SessionLocal, from models import User)
+
+def seed_users_from_csv():
+    # Path to your CSV file in the repository
+    csv_path = "path_to_your_users.csv" # Update this to your actual CSV filename/path
+    if not os.path.exists(csv_path):
+        return
+
+    # db = SessionLocal()
+    try:
+        # Check if users already exist to avoid duplicates
+        # if db.query(User).count() > 0:
+        #     return
+
+        with open(csv_path, mode="r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                # Map your CSV columns to your User model fields
+                # user = User(
+                #     email=row["email"],
+                #     password=row["password"], # or hashed password
+                #     role=row.get("role", "student")
+                # )
+                # db.add(user)
+            # db.commit()
+    finally:
+        pass # db.close()
+
+# Call this function right when your app starts up!
+# seed_users_from_csv()
