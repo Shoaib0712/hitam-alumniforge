@@ -4,3 +4,5 @@ pandas
 numpy
 SQLAlchemy
 pydantic
+python-jose[cryptography]
+passlib[bcrypt]
