@@ -768,3 +768,19 @@ def book_mentorship_session(payload: MentorshipBooking, db: Session = Depends(ge
     db.commit()
     db.refresh(session)
     return {"message": "Mentorship session requested successfully", "session_id": session.id}
+from sqlalchemy.orm import Session
+# (Make sure to import your database model, e.g., 'from database import SessionLocal', 'from models import User')
+
+def create_admin_if_not_exists():
+    # Adjust this depending on how your database session is created
+    # db = SessionLocal()
+    try:
+        admin_email = "admin@hitam.org"
+        # Check if admin already exists in the database
+        # existing = db.query(User).filter(User.email == admin_email).first()
+        # if not existing:
+        #     admin_user = User(email=admin_email, password="Admin@123", role="admin") # hash your password if your app requires it!
+        #     db.add(admin_user)
+        #     db.commit()
+    finally:
+        pass # db.close()
