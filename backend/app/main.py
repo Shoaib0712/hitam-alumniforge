@@ -802,8 +802,17 @@ def seed_users_from_csv():
         #     return
 
         with open(csv_path, mode="r", encoding="utf-8") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
+        reader = csv.DictReader(file)
+        for row in reader:
+            # Map your CSV columns to your User model fields
+            # user = User(
+            #     email=row["email"],
+            #     password=row["password"],
+            #     role=row.get("role", "student")
+            # )
+            # db.add(user)
+        # db.commit()
+    # finally block if needed
                 # Map your CSV columns to your User model fields
                 # user = User(
                 #     email=row["email"],
