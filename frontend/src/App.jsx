@@ -97,7 +97,7 @@ function App() {
     event.preventDefault();
     setError("");
     try {
-      const response = await API.post("http://127.0.0.1:8000/auth/login", {
+      const response = await API.post("/auth/login", {
         email: email,
         password: password
       });

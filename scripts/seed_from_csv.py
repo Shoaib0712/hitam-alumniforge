@@ -123,6 +123,75 @@ def seed_profile(row, db):
     return is_new
 
 
+def ensure_demo_accounts(db):
+    demo_accounts = [
+        {
+            "email": "rahul@hitam.org",
+            "password": "230101",
+            "role": "STUDENT",
+            "profile": {
+                "roll_number": "230101",
+                "name": "Rahul Sharma",
+                "branch": "Data Science",
+                "degree": "B.Tech",
+                "graduation_year": 2027,
+                "cgpa": 8.8,
+                "skills": ["Python", "Machine Learning", "SQL", "Pandas"],
+                "career_goal": "Machine Learning Engineer",
+            },
+        },
+        {
+            "email": "vikram.alumni@hitam.org",
+            "password": "ALUM2020",
+            "role": "ALUMNI",
+            "profile": {
+                "alumni_id": "ALUM2020",
+                "name": "Vikram Reddy",
+                "branch": "Data Science",
+                "degree": "B.Tech",
+                "graduation_year": 2020,
+                "company": "Microsoft",
+                "current_role": "Senior ML Engineer",
+                "skills": ["Python", "Machine Learning", "Docker", "MLOps"],
+                "mentorship_available": True,
+            },
+        },
+    ]
+    for account in demo_accounts:
+        user = db.query(User).filter(User.email == account["email"]).first()
+        if user is None:
+            user = User(
+                email=account["email"],
+                hashed_password=get_password_hash(account["password"]),
+                role=account["role"],
+                must_change_password=True,
+                is_active=True,
+            )
+            db.add(user)
+            db.flush()
+        else:
+            user.role = account["role"]
+            user.is_active = True
+            # Demo credentials are documented and must remain usable after a
+            # stale local database is upgraded.
+            if not verify_seed_password(account["password"], user.hashed_password):
+                user.hashed_password = get_password_hash(account["password"])
+                user.must_change_password = True
+
+        profile_model = StudentProfile if account["role"] == "STUDENT" else AlumniProfile
+        profile = db.query(profile_model).filter(profile_model.user_id == user.id).first()
+        if profile is None:
+            db.add(profile_model(user_id=user.id, **account["profile"]))
+
+
+def verify_seed_password(password, hashed_password):
+    try:
+        from app.auth import verify_password
+        return verify_password(password, hashed_password)
+    except (ValueError, TypeError):
+        return False
+
+
 def seed_from_csv():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -131,6 +200,14 @@ def seed_from_csv():
             db.add(User(email="admin@hitam.org", hashed_password=get_password_hash("Admin@123"),
                         role="ADMIN", must_change_password=False, is_active=True))
             db.commit()
+        else:
+            admin = db.query(User).filter(User.email == "admin@hitam.org").first()
+            if not verify_seed_password("Admin@123", admin.hashed_password):
+                admin.hashed_password = get_password_hash("Admin@123")
+                admin.must_change_password = False
+            admin.role = "ADMIN"
+            admin.is_active = True
+        ensure_demo_accounts(db)
         total = 0
         for filename in ("alumni_clean.csv", "students_clean.csv"):
             path = DATA_DIR / filename
