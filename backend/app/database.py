@@ -30,8 +30,12 @@ def ensure_schema():
     }
     inspector = inspect(engine)
     with engine.begin() as connection:
+        table_names = inspector.get_table_names()
         for table, columns in additions.items():
-            existing = {column["name"] for column in inspector.get_columns(table)} if table in inspector.get_table_names() else set()
+            # If the table doesn't exist yet, skip ALTER TABLE (create_all will build it fresh)
+            if table not in table_names:
+                continue
+            existing = {column["name"] for column in inspector.get_columns(table)}
             for name, definition in columns.items():
                 if name not in existing:
                     connection.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {definition}"))
