@@ -768,3 +768,12 @@ def book_mentorship_session(payload: MentorshipBooking, db: Session = Depends(ge
     db.commit()
     db.refresh(session)
     return {"message": "Mentorship session requested successfully", "session_id": session.id}
+
+@app.on_event("startup")
+def auto_seed_database():
+    from app.database import SessionLocal
+    try:
+        # We can add your quick user insertion here
+        pass
+    finally:
+        db.close()
