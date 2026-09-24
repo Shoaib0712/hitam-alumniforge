@@ -772,6 +772,7 @@ def book_mentorship_session(payload: MentorshipBooking, db: Session = Depends(ge
 @app.on_event("startup")
 def auto_seed_database():
     from app.database import SessionLocal
+    db = SessionLocal()
     try:
         # We can add your quick user insertion here
         pass
