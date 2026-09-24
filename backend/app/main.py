@@ -772,9 +772,29 @@ def book_mentorship_session(payload: MentorshipBooking, db: Session = Depends(ge
 @app.on_event("startup")
 def auto_seed_database():
     from app.database import SessionLocal
+    from app.models import User  # Make sure User model is imported
+    from app.utils import get_password_hash  # Or however you hash passwords, or use raw if testing
+    
     db = SessionLocal()
     try:
-        # We can add your quick user insertion here
-        pass
+        # Check if admin already exists
+        admin_user = db.query(User).filter(User.email == "admin@hitam.org").first()
+        if not admin_user:
+            # Create default admin user
+            from passlib.context import CryptContext
+            pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+            hashed_password = pwd_context.hash("Admin@123")
+            
+            new_admin = User(
+                email="admin@hitam.org",
+                hashed_password=hashed_password,
+                role="admin",
+                full_name="Admin User"
+            )
+            db.add(new_admin)
+            db.commit()
+            print("Default admin user created successfully!")
+    except Exception as e:
+        print(f"Seeding skipped or failed: {e}")
     finally:
         db.close()
