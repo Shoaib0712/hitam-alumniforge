@@ -9,10 +9,6 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: sqlite:////var/data/app.db
+        value: sqlite:///./app.db
       - key: SECRET_KEY
         generateValue: true
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
