@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: hitam-alumniforge-api
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:////var/data/app.db
+      - key: ALLOWED_ORIGINS
+        sync: false
+    disk:
+      name: alumniforge-data
+      mountPath: /var/data
+      sizeGB: 1
